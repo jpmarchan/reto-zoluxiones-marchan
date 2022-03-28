@@ -97,34 +97,30 @@ export async function updateVariant(req: Request, res: Response) {
                 { condition: new Condition().filter('id').exists() },
             );
         }
-        if (symptoms) {
-            await Covid19VariantsModel.update(
-                { id: id },
-                { symptoms: symptoms },
-                { condition: new Condition().filter('id').exists() },
-            );
-        }
-        if (lethality) {
-            await Covid19VariantsModel.update(
-                { id: id },
-                { lethality: lethality },
-                { condition: new Condition().filter('id').exists() },
-            );
-        }
-        if (vaccine) {
-            await Covid19VariantsModel.update(
-                { id: id },
-                { vaccine: vaccine },
-                { condition: new Condition().filter('id').exists() },
-            );
-        }
-        if (treatments) {
-            await Covid19VariantsModel.update(
-                { id: id },
-                { treatments: treatments },
-                { condition: new Condition().filter('id').exists() },
-            );
-        }
+        await Covid19VariantsModel.update(
+            { id: id },
+            { symptoms: symptoms },
+            { condition: new Condition().filter('id').exists() },
+        );
+
+        await Covid19VariantsModel.update(
+            { id: id },
+            { lethality: lethality },
+            { condition: new Condition().filter('id').exists() },
+        );
+
+        await Covid19VariantsModel.update(
+            { id: id },
+            { vaccine: vaccine },
+            { condition: new Condition().filter('id').exists() },
+        );
+
+        await Covid19VariantsModel.update(
+            { id: id },
+            { treatments: treatments },
+            { condition: new Condition().filter('id').exists() },
+        );
+
         let resultUpdate = await Covid19VariantsModel.update(
             { id: id },
             { updateDate: date },
