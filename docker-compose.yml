@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  api:
+    container_name: zoluxiones-reto
+    build:
+      context: .
+    volumes:
+      - ./:/api:rw
+      - ./nodemon.json:/api/nodemon.json
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - "3000:3000"
+    networks:
+      - dockernet
+
+networks:
+    dockernet:
+        external: true
