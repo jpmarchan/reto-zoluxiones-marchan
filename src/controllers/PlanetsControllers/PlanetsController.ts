@@ -1,46 +1,48 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { hashMD5 } from '../../helpers/helpers';
-import { Covid19VariantsModel } from '../../models/Covid19Variants';
+import { PlanetsModel } from '../../models/Planets';
 import { Condition } from 'dynamoose';
 
 
-export async function createVariant(req: Request, res: Response) {
+export async function createPlanets(req: Request, res: Response) {
     const result = validationResult(req);
-    const { name, identified_in, spread, symptoms, lethality, vaccine, treatments } = req.body;
+    const { climate, diameter, gravity, name, orbital_period, population, residents, films, url } = req.body;
     if (!result.isEmpty()) {
         return res.status(422).json({ errros: result.array() })
     } else {
         const date = new Date().getTime() / 1000;
         const id = hashMD5(`${name}${date}`);
-        const result = await Covid19VariantsModel.create({
+        const result = await PlanetsModel.create({
             id: id,
+            climate: climate,
+            diameter: diameter,
+            gravity: gravity,
             name: name,
-            identified_in: identified_in,
-            spread: spread,
-            symptoms: symptoms,
-            lethality: lethality,
-            vaccine: vaccine,
-            treatments: treatments,
-            createdDate: date,
-            updateDate: date,
+            orbital_period: orbital_period,
+            population: population,
+            residents: residents,
+            films: films,
+            url: url,
+            created: date.toString(),
+            edited: date.toString(),
 
         });
         res.json({
             status: true,
-            message: "CREATE_NEW_VARIANT",
+            message: "CREATE_NEW_PLANETS",
             data: result,
         });
 
     }
 }
 
-export async function getVariant(req: Request, res: Response) {
+export async function getPlanets(req: Request, res: Response) {
     try {
-        const dataVariant = await Covid19VariantsModel.scan().all().exec();
+        const dataVariant = await PlanetsModel.scan().all().exec();
         res.json({
             status: true,
-            message: "LIST_COVID19_VARIANTS",
+            message: "LIST_PLANETS",
             data: dataVariant,
         });
     } catch (error) {
@@ -52,13 +54,13 @@ export async function getVariant(req: Request, res: Response) {
     }
 }
 
-export async function getByIdVariant(req: Request, res: Response) {
+export async function getByIdPlanet(req: Request, res: Response) {
     const id = req.params.id;
     if (id) {
-        const dataVariant = await Covid19VariantsModel.scan("id").eq(id).exec();
+        const dataVariant = await PlanetsModel.scan("id").eq(id).exec();
         res.json({
             status: true,
-            message: dataVariant[0] ? "LIST_COVID19_VARIANTS" : "NOT_REGISTERS",
+            message: dataVariant[0] ? "LIST_PLANETS" : "NOT_REGISTERS",
             data: dataVariant[0] ? dataVariant[0] : null,
         });
 
@@ -71,64 +73,73 @@ export async function getByIdVariant(req: Request, res: Response) {
 
 }
 
-export async function updateVariant(req: Request, res: Response) {
-    const { id, name, identified_in, spread, symptoms, lethality, vaccine, treatments } = req.body;
+export async function updatePlanet(req: Request, res: Response) {
+    const { id, climate, diameter, gravity, name, orbital_period, population, residents, films, url } = req.body;
     const date = new Date().getTime() / 1000;
-    const dataVariant = await Covid19VariantsModel.scan("id").eq(id).exec();
+    const dataVariant = await PlanetsModel.scan("id").eq(id).exec();
     if (dataVariant.length > 0) {
         if (name) {
-            await Covid19VariantsModel.update(
+            await PlanetsModel.update(
                 { id: id },
                 { name: name },
                 { condition: new Condition().filter('id').exists() },
             );
         }
-        if (identified_in) {
-            await Covid19VariantsModel.update(
+        if (climate) {
+            await PlanetsModel.update(
                 { id: id },
-                { identified_in: identified_in },
+                { climate: climate },
                 { condition: new Condition().filter('id').exists() },
             );
         }
-        if (spread) {
-            await Covid19VariantsModel.update(
+        if (diameter) {
+            await PlanetsModel.update(
                 { id: id },
-                { spread: spread },
+                { diameter: diameter },
                 { condition: new Condition().filter('id').exists() },
             );
         }
-        await Covid19VariantsModel.update(
+        await PlanetsModel.update(
             { id: id },
-            { symptoms: symptoms },
+            { gravity: gravity },
             { condition: new Condition().filter('id').exists() },
         );
 
-        await Covid19VariantsModel.update(
+        await PlanetsModel.update(
             { id: id },
-            { lethality: lethality },
+            { orbital_period: orbital_period },
             { condition: new Condition().filter('id').exists() },
         );
 
-        await Covid19VariantsModel.update(
+        await PlanetsModel.update(
             { id: id },
-            { vaccine: vaccine },
+            { population: population },
             { condition: new Condition().filter('id').exists() },
         );
 
-        await Covid19VariantsModel.update(
+        await PlanetsModel.update(
             { id: id },
-            { treatments: treatments },
+            { residents: residents },
             { condition: new Condition().filter('id').exists() },
         );
-
-        let resultUpdate = await Covid19VariantsModel.update(
+        await PlanetsModel.update(
             { id: id },
-            { updateDate: date },
+            { films: films },
+            { condition: new Condition().filter('id').exists() },
+        );
+        await PlanetsModel.update(
+            { id: id },
+            { url: url },
+            { condition: new Condition().filter('id').exists() },
+        );
+        let resultUpdate = await PlanetsModel.update(
+            { id: id },
+            { created: date.toString() },
             { condition: new Condition().filter('id').exists() },
         );
         res.json({
             status: true,
-            message: "UPDATE_VARIANT",
+            message: "UPDATE_PLANET",
             data: resultUpdate
         });
     } else {
@@ -139,11 +150,11 @@ export async function updateVariant(req: Request, res: Response) {
     }
 }
 
-export async function deleteVariant(req: Request, res: Response) {
+export async function deletePlanet(req: Request, res: Response) {
     const id = req.params.id;
     if (id) {
         try {
-            Covid19VariantsModel.delete(id, error => {
+            PlanetsModel.delete(id, error => {
                 if (error) {
                     res.json({
                         result: { status: false }
@@ -152,7 +163,7 @@ export async function deleteVariant(req: Request, res: Response) {
             });
             res.json({
                 status: true,
-                message: "VARIANT_DELETE_SUCCESS",
+                message: "PLANET_DELETE_SUCCESS",
             });
 
         } catch (error) {
